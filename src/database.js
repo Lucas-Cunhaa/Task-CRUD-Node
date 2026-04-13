@@ -1,4 +1,5 @@
-import fs from 'node:fs/promises'
+import fs from 'node:fs'
+import { randomUUID } from 'node:crypto'
 
 const databasePath = new URL('../db.json', import.meta.url)
 
@@ -6,20 +7,29 @@ export class Database  {
     #database = {}
 
     constructor() {
-        fs.readFile(databasePath, 'utf-8').then(data => {
+        try {
+            const data = fs.readFileSync(databasePath, 'utf-8')
             this.#database = JSON.parse(data)
-        }).catch(() => {
-            this.#persist
-        })
+        } catch {
+            this.#database = {}
+        }
+      
     }
 
     #persist() {
         fs.writeFile(databasePath, JSON.stringify(this.#database))
     }
 
-    select(table, search) {
-        let data = this.#database[table] ?? []
+    #createTable(table) {
+        this.#database[table] = {}
 
+        this.#persist()
+    }
+
+    select(table, search) {
+      
+        let data = this.#database[table] ?? {}
+        
         if (search) {
             data = data.filter(row => {
                 return Object.entries(search).some(([key, value]) => {
@@ -27,35 +37,32 @@ export class Database  {
                 })
             })
         }
-  
-        return data
+        
+        return this.#database.tasks
     }
 
     insert(table, data) {
-        if (Array.isArray(this.#database[table])) 
-            this.#database[table].push(data)
-        else 
-            this.#database[table][data.id] = data
+        const currentTable = this.#database[table]
+        if(!currentTable) 
+            this.#createTable(table)
+           
+        const id = randomUUID()
+        this.#database[table][id] = data
 
         this.#persist()
     }
 
     update(table, id, data) {
-        const data = this.#database[table][id]
+        const currentData = this.#database[table][id]
 
-        if(data && data.id === id) { 
+        if(currentData) { 
             this.#database[table][id] = data
             this.#persist()
         }
     }
 
-    delet(table, id) {
-        const {id, ...rest} = this.#database[table]
-
-        if(data) { 
-            this.#database[table] = rest
-            this.#persist()
-        }
+    delete(table, id) {
+        delete this.#database[table][id]
     }
 
 }
