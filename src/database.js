@@ -1,4 +1,4 @@
-import fs from 'node:fs'
+import fs from 'node:fs/promises'
 import { randomUUID } from 'node:crypto'
 
 const databasePath = new URL('../db.json', import.meta.url)
@@ -7,13 +7,11 @@ export class Database  {
     #database = {}
 
     constructor() {
-        try {
-            const data = fs.readFileSync(databasePath, 'utf-8')
+        fs.readFile(databasePath, 'utf-8').then((data) => {
             this.#database = JSON.parse(data)
-        } catch {
+        }).catch(
             this.#database = {}
-        }
-      
+        )
     }
 
     #persist() {
@@ -50,6 +48,8 @@ export class Database  {
         this.#database[table][id] = data
 
         this.#persist()
+
+        return true
     }
 
     update(table, id, data) {
