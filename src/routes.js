@@ -4,7 +4,13 @@ import { Database } from './database.js'
 const database = new Database();
 
 export const routes = {
-    GET: [{ path: "api/tasks", handler: "" }],
+    GET:  {
+            "/api/tasks": async(req, res) => {
+                const tasks = database.select('tasks')
+
+                return res.writeHead(200).end(JSON.stringify(tasks))
+            } 
+        },
 
     POST: 
         {

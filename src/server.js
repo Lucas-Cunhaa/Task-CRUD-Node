@@ -8,8 +8,8 @@ const server = http.createServer(async (req, res) => {
     await jsonParse(req, res)
     try {
         const route = routes[method][url]
-        
-        if(route) return route()
+
+        return route(req, res)
     } catch(err) {
         return res.writeHead(404).end()
     }
