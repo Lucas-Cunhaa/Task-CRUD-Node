@@ -1,4 +1,4 @@
-import { Task } from "./tasks";
+import { Task } from "./tasks.js";
 import { Database } from './database.js'
 
 const database = new Database();
@@ -6,9 +6,9 @@ const database = new Database();
 export const routes = {
     GET: [{ path: "api/tasks", handler: "" }],
 
-    POST: [
-        { 
-            path: "api/tasks", handler: async(req, res) => {
+    POST: 
+        {
+            "/api/tasks": async(req, res) => {
                 const { title, description } = req.body 
                 if(!title && !description) 
                     return res.writeHead(400).end('Criterias are missing')
@@ -20,10 +20,9 @@ export const routes = {
         
                 res.writeHead(404).end('Error while inserting')
             } 
-        }
-    ],
+        },
 
-  PUT: [{ path: "api/tasks", handler: "" }],
+  PUT: [{ path: "/api/tasks", handler: "" }],
 
-  DELETE: [{ path: "api/tasks", handler: "" }],
+  DELETE: [{ path: "/api/tasks", handler: "" }],
 };

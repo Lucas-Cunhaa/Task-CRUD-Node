@@ -1,18 +1,21 @@
 import http from 'node:http'
-import { Database } from './database.js'
+import { routes } from './routes.js'
+import { jsonParse } from './middlewares/jsonParse.js'
 
 const server = http.createServer(async (req, res) => {
     const { method, url } = req
-    const database = new Database()
-
-    if(method === "GET" && url === "/api/task") {
-        res.writeHead(200).end(JSON.stringify(database.select("tasks")))
+    
+    await jsonParse(req, res)
+    try {
+        const route = routes[method][url]
+        
+        if(route) return route()
+    } catch(err) {
+        return res.writeHead(404).end()
     }
+    
 
-    if(method === "POST" && url === "/api/task") {
-        database.insert("tasks", {name: 123})
-        res.writeHead(201).end("OK")
-    }
+    
 })
 
 server.listen(3000)
