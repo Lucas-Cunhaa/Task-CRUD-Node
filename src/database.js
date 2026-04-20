@@ -1,5 +1,4 @@
 import fs from 'node:fs/promises'
-import { randomUUID } from 'node:crypto'
 
 const databasePath = new URL('../db.json', import.meta.url)
 
@@ -9,9 +8,9 @@ export class Database  {
     constructor() {
         fs.readFile(databasePath, 'utf-8').then((data) => {
             this.#database = JSON.parse(data)
-        }).catch(
-            this.#database = {}
-        )
+        }).catch(() => {
+        this.#persist()
+      })
     }
 
     #persist() {
@@ -19,24 +18,29 @@ export class Database  {
     }
 
     #createTable(table) {
-        this.#database[table] = {}
+        this.#database[table] = []
 
         this.#persist()
     }
 
-    select(table, search) {
-      
+    select(table, search, id=null ) {
         let data = this.#database[table] ?? {}
-        
-        if (search) {
-            data = data.filter(row => {
+
+        if (id) 
+            data = data.filter(row => row.id === id)
+
+        if (search && Object.keys(search).length !== 0) {
+            data = data.filter((row) => {
                 return Object.entries(search).some(([key, value]) => {
+                    console.log(row)
                     return row[key].toLowerCase().includes(value.toLowerCase())
                 })
             })
         }
+
+    
+        return data
         
-        return this.#database.tasks
     }
 
     insert(table, data) {
@@ -44,8 +48,7 @@ export class Database  {
         if(!currentTable) 
             this.#createTable(table)
            
-        const id = randomUUID()
-        this.#database[table][id] = data
+        this.#database[table].push(data)
 
         this.#persist()
 

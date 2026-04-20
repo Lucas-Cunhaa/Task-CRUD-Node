@@ -7,10 +7,18 @@ const database = new Database();
 export const routes = {
     GET:  [
             {
+                path: buildPath("/api/tasks/:id"),
+                handler: async(req, res) => {
+                
+                    const tasks = database.select('tasks', req.query, req.params.id)
+                    return res.writeHead(200).end(JSON.stringify(tasks))
+                } 
+            }, 
+            {
                 path: buildPath("/api/tasks"),
                 handler: async(req, res) => {
-                    const tasks = database.select('tasks')
-
+                    
+                    const tasks = database.select('tasks', req.query)
                     return res.writeHead(200).end(JSON.stringify(tasks))
                 } 
             }
@@ -30,7 +38,6 @@ export const routes = {
                     if(insertion) return res.writeHead(200).end('Task inserted Sucefully')
             
                     res.writeHead(404).end('Error while inserting')
-
                  }
             } 
         ],
