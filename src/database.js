@@ -1,7 +1,6 @@
 import fs from 'node:fs/promises'
 
 const databasePath = new URL('../db.json', import.meta.url)
-
 export class Database  {
     #database = {}
 
@@ -38,9 +37,7 @@ export class Database  {
             })
         }
 
-    
         return data
-        
     }
 
     insert(table, data) {
@@ -55,12 +52,18 @@ export class Database  {
         return true
     }
 
-    update(table, id, data) {
-        const currentData = this.#database[table][id]
+    update(table, id, newData) {
+        const dataIndex = this.#database[table].findIndex(row => row.id === id)
+        if(dataIndex) { 
+            const currentData = this.#database[table][dataIndex]
+            const updatedData = {
+                ...currentData,
+                ...newData,
+                updatedAt: new Date().toISOString()
+            }
+            this.#database[table][dataIndex] = newData
 
-        if(currentData) { 
-            this.#database[table][id] = data
-            this.#persist()
+            return updatedData
         }
     }
 

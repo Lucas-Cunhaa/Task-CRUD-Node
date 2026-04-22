@@ -17,7 +17,7 @@ export const routes = {
             {
                 path: buildPath("/api/tasks"),
                 handler: async(req, res) => {
-                    
+
                     const tasks = database.select('tasks', req.query)
                     return res.writeHead(200).end(JSON.stringify(tasks))
                 } 
@@ -29,7 +29,7 @@ export const routes = {
                 path: buildPath("/api/tasks"), 
                 handler: async(req, res) => {
                     const { title, description } = req.body 
-                    if(!title && !description) 
+                    if(!title || !description) 
                         return res.writeHead(400).end('Criterias are missing')
         
                     const newTask  = new Task(title, description) 
@@ -42,7 +42,36 @@ export const routes = {
             } 
         ],
 
-  PUT: [{ path: "/api/tasks", handler: "" }],
+  PUT: [
+        { 
+            path: buildPath("/api/tasks/:id"),
+            handler: async(req, res) => {
+                const { id } = req.params
+                const { title, description, completed_at: unformated_completed_at } = req.body
+                const completed_at = new Date(unformated_completed_at).toISOString
+
+                if(!title || !description || !completed_at)
+                    res.writeHead(400).end("Empty Task Fields")
+
+                if(!existsTask(id)) 
+                    res.writeHead(400).end("Id does not match any task")
+
+                const update = database.update('tasks',id, {title, description, completed_at})
+                
+                if(update)
+                    res.writeHead(200).end(JSON.stringify(update))
+                else
+                    res.writeHead(404).end("An error ocurred while updating the task")
+            }
+        },
+
+    ],
 
   DELETE: [{ path: "/api/tasks", handler: "" }],
 };
+
+function existsTask(id) {
+     const existsId = database.select('tasks', {}, id)
+    
+     return existsId.length !== 0
+}
