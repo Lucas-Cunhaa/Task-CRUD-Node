@@ -99,8 +99,24 @@ export const routes = {
         },
 
     ],
+    
+    DELETE: [
+        { 
+             path: buildPath("/api/tasks/:id"), 
+             handler: async(req, res) => {
+                const { id } = req.params
 
-  DELETE: [{ path: "/api/tasks", handler: "" }],
+                if(!existsTask(id)) 
+                    return res.writeHead(400).end("Id does not match any task")
+
+                const deleted = database.delete("tasks", id)
+                if(deleted) 
+                    return res.writeHead(200).end(JSON.stringify(deleted))
+                
+                return res.writeHead(404).end("Error while deliting the task")
+             }
+        }
+    ],
 };
 
 function existsTask(id) {

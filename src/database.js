@@ -69,7 +69,14 @@ export class Database  {
     }
 
     delete(table, id) {
-        delete this.#database[table][id]
+        const dataIndex = this.#database[table].findIndex(row => row.id === id)
+
+        if(Number.isInteger(dataIndex)) {
+            const deleted = this.#database[table][dataIndex]
+            this.#database[table].splice(dataIndex, 1)
+            
+            return deleted
+        }
     }
 
 }
