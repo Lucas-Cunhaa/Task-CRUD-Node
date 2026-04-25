@@ -51,17 +51,50 @@ export const routes = {
                 const completed_at = new Date(unformated_completed_at).toISOString
 
                 if(!title || !description || !completed_at)
-                    res.writeHead(400).end("Empty Task Fields")
+                    return res.writeHead(400).end("Empty Task Fields")
 
                 if(!existsTask(id)) 
-                    res.writeHead(400).end("Id does not match any task")
+                    return res.writeHead(400).end("Id does not match any task")
 
                 const update = database.update('tasks',id, {title, description, completed_at})
                 
                 if(update)
-                    res.writeHead(200).end(JSON.stringify(update))
-                else
-                    res.writeHead(404).end("An error ocurred while updating the task")
+                    return res.writeHead(200).end(JSON.stringify(update))
+
+                return res.writeHead(404).end("An error ocurred while updating the task")
+            }
+        },
+
+    ],
+
+  PATCH: [
+        { 
+            path: buildPath("/api/tasks/:id"),
+            handler: async(req, res) => {
+                const { id } = req.params
+                const bodyField = {
+                    title: req.body.title,
+                    description: req.body.description,
+                    completed_at: req.body.completed_at !== undefined 
+                        ? new Date.toISOString(req.body.completed_at): 
+                        undefined
+                }
+                
+                const cleanedBody = {}
+                for (const key in bodyField) {
+                    if(bodyField[key] !== undefined && bodyField[key] !== null) 
+                        cleanedBody[key] = bodyField[key]
+                }
+                
+                if(!existsTask(id)) 
+                    return res.writeHead(400).end("Id does not match any task")
+                
+                const update = database.update('tasks', id, cleanedBody)
+                
+                if(update) 
+                    return res.writeHead(200).end(JSON.stringify(update))
+                
+                return res.writeHead(404).end("An error ocurred while updating the task")
             }
         },
 

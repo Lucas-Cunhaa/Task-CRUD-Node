@@ -54,14 +54,15 @@ export class Database  {
 
     update(table, id, newData) {
         const dataIndex = this.#database[table].findIndex(row => row.id === id)
-        if(dataIndex) { 
+        if(Number.isInteger(dataIndex)) { 
             const currentData = this.#database[table][dataIndex]
             const updatedData = {
                 ...currentData,
                 ...newData,
-                updatedAt: new Date().toISOString()
+                updated_at: new Date().toISOString()
             }
-            this.#database[table][dataIndex] = newData
+                        
+            this.#database[table][dataIndex] = updatedData
 
             return updatedData
         }
