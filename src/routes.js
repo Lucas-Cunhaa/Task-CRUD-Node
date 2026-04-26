@@ -47,8 +47,8 @@ export const routes = {
             path: buildPath("/api/tasks/:id"),
             handler: async(req, res) => {
                 const { id } = req.params
-                const { title, description, completed_at: unformated_completed_at } = req.body
-                const completed_at = new Date(unformated_completed_at).toISOString
+                const { title, description, completed_at: parse_completed_at } = req.body
+                const completed_at = new Date(parse_completed_at).toISOString()
 
                 if(!title || !description || !completed_at)
                     return res.writeHead(400).end("Empty Task Fields")
@@ -97,6 +97,25 @@ export const routes = {
                 return res.writeHead(404).end("An error ocurred while updating the task")
             }
         },
+        
+        {
+            path: buildPath("/api/tasks/complete/:id"),
+            handler: async(req, res) => {
+                const { id } = req.params
+                const { completed_at: parse_complete } = req.body
+                
+                if(!existsTask(id)) 
+                    return res.writeHead(400).end("Id does not match any task")
+
+                const completed_at = new Date(parse_complete).toISOString()
+                const update = database.update('tasks', id, { completed_at })
+                
+                if(update) 
+                    return res.writeHead(200).end(JSON.stringify(update))
+                
+                return res.writeHead(404).end("An error ocurred while updating the task")
+            }
+        }
 
     ],
     
