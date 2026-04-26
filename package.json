@@ -2,10 +2,10 @@
   "name": "task-crud-node",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node --watch src/server.js" 
+    "dev": "node --watch src/server.js"
   },
   "repository": {
     "type": "git",
@@ -14,9 +14,12 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/Lucas-Cunhaa/Task-CRUD-Node/issues"
   },
-  "homepage": "https://github.com/Lucas-Cunhaa/Task-CRUD-Node#readme"
+  "homepage": "https://github.com/Lucas-Cunhaa/Task-CRUD-Node#readme",
+  "dependencies": {
+    "csv-parser": "^3.2.0"
+  }
 }
