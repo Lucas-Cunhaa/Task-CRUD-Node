@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 const dataPath = new URL('../data/tasks.csv', import.meta.url)
 
-const head = "title, description"
+const head = "title,description"
 fs.writeFileSync(dataPath, head, 'utf-8')
 
 const stream = fs.createWriteStream(dataPath, { flags: "w" });
@@ -18,12 +18,12 @@ const topicsBase = [
 ];
 
 // gera 1000 variações
-const verbs = Array.from({ length: 1000 }, (_, i) => {
+const verbs = Array.from({ length: 100 }, (_, i) => {
   const base = verbsBase[i % verbsBase.length];
   return `${base} ${i + 1}`;
 });
 
-const topics = Array.from({ length: 1000 }, (_, i) => {
+const topics = Array.from({ length: 100 }, (_, i) => {
   const base = topicsBase[i % topicsBase.length];
   return `${base} ${i + 1}`;
 });
@@ -33,7 +33,7 @@ for (let i = 0; i < verbs.length; i++) {
         const title = topics[j]
         const description = `${verbs[i]} ${topics[j]}`
 
-        if (!stream.write(`${title},${description}\n`)) {
+        if (!stream.write(`\n${title},${description}`)) {
              await new Promise(resolve => stream.once("drain", resolve));
         }
 
